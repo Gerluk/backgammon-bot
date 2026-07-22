@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
@@ -7,6 +8,10 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/benchmark" />
+            <option value="$PROJECT_DIR$/bots" />
+            <option value="$PROJECT_DIR$/engine" />
+            <option value="$PROJECT_DIR$/gui" />
           </set>
         </option>
         <option name="myGradleHome" value="" />
