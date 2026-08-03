@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameEngine {
-    public Player WinnerOrNull(Board board) {
+    public Player winnerOrNull(Board board) {
         if (board.hasWon(Player.WHITE)) {
             return Player.WHITE;
         }

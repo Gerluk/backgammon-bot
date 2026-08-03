@@ -1,6 +1,7 @@
 package org.example.model;
 
 import java.util.List;
+import java.util.Random;
 
 public record Dice(int die1, int die2) {
 
@@ -8,6 +9,10 @@ public record Dice(int die1, int die2) {
         if (die1 < 1 || die1 > 6 || die2 < 1 || die2 > 6) {
             throw new IllegalArgumentException("Wartości kości muszą być w zakresie 1-6");
         }
+    }
+
+    public static Dice roll(Random random) {
+        return new Dice(random.nextInt(1, 7), random.nextInt(1, 7));
     }
 
     public boolean isDouble() {
