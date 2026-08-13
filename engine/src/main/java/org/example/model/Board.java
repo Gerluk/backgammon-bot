@@ -86,9 +86,9 @@ public final class Board {
         checkIndex(index);
         int value = points[index];
         if (opponentOf == Player.WHITE) {
-            return value == -1;
-        } else {
             return value == 1;
+        } else {
+            return value == -1;
         }
     }
 
