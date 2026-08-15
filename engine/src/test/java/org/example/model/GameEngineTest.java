@@ -144,24 +144,24 @@ class GameEngineTest {
     }
 
     @Test
-    void legalMovesForStepEntryFromBarWhiteAlwaysEntersInOwnHomeDirectionRange() {
+    void legalMovesForStepEntryFromBarWhiteAlwaysEntersInOpponentsHome() {
         Board board = Board.customPosition(new int[Board.NUM_POINTS], 1, 0, 0, 0);
         for (int die = 1; die <= 6; die++) {
             GameState state = new GameState(board, Player.WHITE, List.of(die));
             List<Move> moves = engine.legalMovesForStep(state, die);
             assertEquals(1, moves.size());
-            assertEquals(die - 1, moves.getFirst().to());
+            assertEquals(24 - die, moves.getFirst().to());
         }
     }
 
     @Test
-    void legalMovesForStepEntryFromBarBlackAlwaysEntersInOwnHomeDirectionRange() {
+    void legalMovesForStepEntryFromBarBlackAlwaysEntersInOpponentsHome() {
         Board board = Board.customPosition(new int[Board.NUM_POINTS], 0, 1, 0, 0);
         for (int die = 1; die <= 6; die++) {
             GameState state = new GameState(board, Player.BLACK, List.of(die));
             List<Move> moves = engine.legalMovesForStep(state, die);
             assertEquals(1, moves.size());
-            assertEquals(24 - die, moves.getFirst().to());
+            assertEquals(die - 1, moves.getFirst().to());
         }
     }
 
@@ -180,7 +180,7 @@ class GameEngineTest {
     @Test
     void legalMovesForStepEntryFromBarBlockedWhenEntryPointOccupiedByOpponent() {
         int[] points = new int[Board.NUM_POINTS];
-        points[2] = -2;
+        points[21] = -2;
         GameState state = new GameState(Board.customPosition(points, 1, 0, 0, 0), Player.WHITE, List.of(3));
 
         assertTrue(engine.legalMovesForStep(state, 3).isEmpty());
@@ -189,12 +189,12 @@ class GameEngineTest {
     @Test
     void legalMovesForStepEntryFromBarCanHitBlot() {
         int[] points = new int[Board.NUM_POINTS];
-        points[2] = -1;
+        points[21] = -1;
         GameState state = new GameState(Board.customPosition(points, 1, 0, 0, 0), Player.WHITE, List.of(3));
 
         List<Move> moves = engine.legalMovesForStep(state, 3);
         assertEquals(1, moves.size());
-        assertEquals(new Move(Move.BAR, 2), moves.getFirst());
+        assertEquals(new Move(Move.BAR, 21), moves.getFirst());
     }
 
     @Test
@@ -509,8 +509,8 @@ class GameEngineTest {
     @Test
     void legalFullTurnsPlayerOnBarNoEntryPossibleReturnsEmptySequence() {
         int[] points = new int[Board.NUM_POINTS];
-        points[0] = -2;
-        points[1] = -2;
+        points[23] = -2;
+        points[22] = -2;
         GameState state = new GameState(Board.customPosition(points, 1, 0, 0, 0), Player.WHITE, List.of(1, 2));
 
         List<List<Move>> turns = engine.legalFullTurns(state);
@@ -522,14 +522,14 @@ class GameEngineTest {
     @Test
     void legalFullTurnsPlayerOnBarEntersWithFirstDieThenContinuesIfSecondDiePlayable() {
         int[] points = new int[Board.NUM_POINTS];
-        points[1] = -2;
+        points[22] = -2;
         GameState state = new GameState(Board.customPosition(points, 1, 0, 0, 0), Player.WHITE, List.of(1, 2));
 
         List<List<Move>> turns = engine.legalFullTurns(state);
 
         int maxLength = turns.stream().mapToInt(List::size).max().orElse(-1);
         assertTrue(maxLength >= 1);
-        assertTrue(turns.stream().anyMatch(t -> !t.isEmpty() && t.getFirst().equals(new Move(Move.BAR, 0))));
+        assertTrue(turns.stream().anyMatch(t -> !t.isEmpty() && t.getFirst().equals(new Move(Move.BAR, 23))));
     }
 
     @Test

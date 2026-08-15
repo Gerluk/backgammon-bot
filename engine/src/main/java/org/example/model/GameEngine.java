@@ -148,7 +148,7 @@ public class GameEngine {
     }
 
     private int entryPointFromBar(Player player, int dieValue) {
-        return player == Player.WHITE ? (dieValue - 1) : (24 - dieValue);
+        return player == Player.WHITE ? (24 - dieValue) : (dieValue - 1);
     }
 
     private int destinationPoint(Player player, int from, int dieValue) {
