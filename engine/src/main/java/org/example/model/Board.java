@@ -115,7 +115,7 @@ public final class Board {
     public void enterFromBar(Player player, int entryPoint) {
         checkIndex(entryPoint);
         if (barCount(player) <= 0) {
-            throw new IllegalStateException("Gracz" + player + " nie ma pionków na barze");
+            throw new IllegalStateException("Gracz " + player + " nie ma pionków na barze");
         }
 
         if (isBlot(player.opponent(), entryPoint)) {
