@@ -1,4 +1,9 @@
-package org.example.model;
+package org.example.rules;
+
+import org.example.model.Board;
+import org.example.model.GameState;
+import org.example.model.Move;
+import org.example.model.Player;
 
 import java.util.ArrayList;
 import java.util.List;

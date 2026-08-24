@@ -1,6 +1,7 @@
 package org.example.bots;
 
 import org.example.model.*;
+import org.example.rules.GameEngine;
 
 import java.util.List;
 import java.util.Random;
