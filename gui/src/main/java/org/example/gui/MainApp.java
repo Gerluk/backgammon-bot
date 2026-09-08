@@ -51,6 +51,10 @@ public class MainApp extends Application {
     private ComboBox<ParticipantType> whiteSelector;
     private ComboBox<ParticipantType> blackSelector;
     private Label menuErrorLabel;
+    private Spinner<Integer> whiteDepth;
+    private Spinner<Integer> blackDepth;
+    private VBox whiteParamsBox;
+    private VBox blackParamsBox;
 
     private GameController controller;
     private boolean bothBots;
@@ -81,8 +85,25 @@ public class MainApp extends Application {
         blackSelector = new ComboBox<>(FXCollections.observableArrayList(ParticipantType.values()));
         blackSelector.getSelectionModel().select(ParticipantType.RANDOM_BOT);
 
-        VBox whiteBox = new VBox(6, new Label("Białe:"), whiteSelector);
-        VBox blackBox = new VBox(6, new Label("Czarne: "), blackSelector);
+        whiteDepth = new Spinner<>(0, 4, 1);
+        whiteDepth.setEditable(true);
+        whiteDepth.setPrefWidth(70);
+        whiteParamsBox = new VBox(4, new Label("Głębokość:"), whiteDepth);
+        whiteParamsBox.setAlignment(Pos.CENTER);
+
+        blackDepth = new Spinner<>(0, 4, 1);
+        blackDepth.setEditable(true);
+        blackDepth.setPrefWidth(70);
+        blackParamsBox = new VBox(4, new Label("Głębokość:"), blackDepth);
+        blackParamsBox.setAlignment(Pos.CENTER);
+
+        whiteSelector.valueProperty().addListener((obs, old, val) -> updateParamsVisibility(val, whiteParamsBox));
+        blackSelector.valueProperty().addListener((obs, old, val) -> updateParamsVisibility(val, blackParamsBox));
+        updateParamsVisibility(whiteSelector.getValue(), whiteParamsBox);
+        updateParamsVisibility(blackSelector.getValue(), blackParamsBox);
+
+        VBox whiteBox = new VBox(6, new Label("Białe:"), whiteSelector, whiteParamsBox);
+        VBox blackBox = new VBox(6, new Label("Czarne: "), blackSelector, blackParamsBox);
         whiteBox.setAlignment(Pos.CENTER);
         blackBox.setAlignment(Pos.CENTER);
 
@@ -104,6 +125,12 @@ public class MainApp extends Application {
         return menu;
     }
 
+    private void updateParamsVisibility(ParticipantType type, VBox paramsBox) {
+        boolean show = type == ParticipantType.EXPECTIMINIMAX_BOT;
+        paramsBox.setVisible(show);
+        paramsBox.setManaged(show);
+    }
+
     private void attemptStartGame() {
         ParticipantType white = whiteSelector.getValue();
         ParticipantType black = blackSelector.getValue();
@@ -114,7 +141,14 @@ public class MainApp extends Application {
         }
 
         menuErrorLabel.setText("");
-        startGame(white.createConfig(), black.createConfig());
+        startGame(buildConfig(white, whiteDepth), buildConfig(black, blackDepth));
+    }
+
+    private PlayerConfig buildConfig(ParticipantType type, Spinner<Integer> depth) {
+        if (type == ParticipantType.EXPECTIMINIMAX_BOT) {
+            return PlayerConfig.bot(new ExpectiminimaxBot(depth.getValue()));
+        }
+        return type.createConfig();
     }
 
     private BorderPane buildGameView() {

@@ -9,6 +9,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameEngine {
+
+    public int pipCount(Board board, Player player) {
+        int total = 0;
+        for (int i = 0; i < Board.NUM_POINTS; i++) {
+            int checkers = board.checkersOf(player, i);
+            if (checkers > 0) {
+                int distance = player == Player.WHITE ? (i + 1) : (24 - i);
+                total += checkers * distance;
+            }
+        }
+        total += board.barCount(player) * 25;
+        return total;
+    }
+
     public Player winnerOrNull(Board board) {
         if (board.hasWon(Player.WHITE)) {
             return Player.WHITE;
