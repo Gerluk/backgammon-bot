@@ -1,11 +1,15 @@
 package org.example.bots;
 
+import org.example.bots.strategy.ExpectiminimaxBot;
+import org.example.bots.strategy.MonteCarloBot;
+import org.example.bots.strategy.RandomBot;
+
 public enum ParticipantType {
 
     HUMAN("Człowiek", true),
     RANDOM_BOT("Random Bot", true),
     EXPECTIMINIMAX_BOT("Expectiminimax Bot", true),
-    MONTE_CARLO_BOT("Monte Carlo Bot", false);
+    MONTE_CARLO_BOT("Monte Carlo Bot", true);
 
     private final String displayName;
     private final boolean available;
@@ -31,8 +35,7 @@ public enum ParticipantType {
             case HUMAN -> PlayerConfig.human();
             case RANDOM_BOT -> PlayerConfig.bot(new RandomBot());
             case EXPECTIMINIMAX_BOT -> PlayerConfig.bot(new ExpectiminimaxBot(1));
-            case MONTE_CARLO_BOT ->
-                throw new UnsupportedOperationException(displayName + " nie jest jeszcze zaimplementowany");
+            case MONTE_CARLO_BOT -> PlayerConfig.bot(new MonteCarloBot(50));
         };
     }
 

@@ -16,6 +16,8 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.example.bots.*;
+import org.example.bots.strategy.ExpectiminimaxBot;
+import org.example.bots.strategy.MonteCarloBot;
 import org.example.model.*;
 
 import java.util.Random;
@@ -53,6 +55,8 @@ public class MainApp extends Application {
     private Label menuErrorLabel;
     private Spinner<Integer> whiteDepth;
     private Spinner<Integer> blackDepth;
+    private Spinner<Integer> whiteSimulations;
+    private Spinner<Integer> blackSimulations;
     private VBox whiteParamsBox;
     private VBox blackParamsBox;
 
@@ -88,13 +92,22 @@ public class MainApp extends Application {
         whiteDepth = new Spinner<>(0, 4, 1);
         whiteDepth.setEditable(true);
         whiteDepth.setPrefWidth(70);
-        whiteParamsBox = new VBox(4, new Label("Głębokość:"), whiteDepth);
-        whiteParamsBox.setAlignment(Pos.CENTER);
 
         blackDepth = new Spinner<>(0, 4, 1);
         blackDepth.setEditable(true);
         blackDepth.setPrefWidth(70);
-        blackParamsBox = new VBox(4, new Label("Głębokość:"), blackDepth);
+
+        whiteSimulations = new Spinner<>(5, 500, 50, 5);
+        whiteSimulations.setEditable(true);
+        whiteSimulations.setPrefWidth(80);
+
+        blackSimulations = new Spinner<>(5, 500, 50, 5);
+        blackSimulations.setEditable(true);
+        blackSimulations.setPrefWidth(80);
+
+        whiteParamsBox = new VBox(4);
+        blackParamsBox = new VBox(4);
+        whiteParamsBox.setAlignment(Pos.CENTER);
         blackParamsBox.setAlignment(Pos.CENTER);
 
         whiteSelector.valueProperty().addListener((obs, old, val) -> updateParamsVisibility(val, whiteParamsBox));
@@ -126,7 +139,18 @@ public class MainApp extends Application {
     }
 
     private void updateParamsVisibility(ParticipantType type, VBox paramsBox) {
-        boolean show = type == ParticipantType.EXPECTIMINIMAX_BOT;
+        boolean isWhiteBox = paramsBox == whiteParamsBox;
+        Spinner<Integer> depthSpinner = isWhiteBox ? whiteDepth : blackDepth;
+        Spinner<Integer> simsSpinner = isWhiteBox ? whiteSimulations : blackSimulations;
+
+        paramsBox.getChildren().clear();
+        if (type == ParticipantType.EXPECTIMINIMAX_BOT) {
+            paramsBox.getChildren().addAll(new Label("Głębokość:"), depthSpinner);
+        } else if (type == ParticipantType.MONTE_CARLO_BOT) {
+            paramsBox.getChildren().addAll(new Label("Symulacje:"), simsSpinner);
+        }
+
+        boolean show = type == ParticipantType.EXPECTIMINIMAX_BOT || type == ParticipantType.MONTE_CARLO_BOT;
         paramsBox.setVisible(show);
         paramsBox.setManaged(show);
     }
@@ -141,12 +165,17 @@ public class MainApp extends Application {
         }
 
         menuErrorLabel.setText("");
-        startGame(buildConfig(white, whiteDepth), buildConfig(black, blackDepth));
+        startGame(
+                buildConfig(white, whiteDepth, whiteSimulations),
+                buildConfig(black, blackDepth, blackSimulations));
     }
 
-    private PlayerConfig buildConfig(ParticipantType type, Spinner<Integer> depth) {
+    private PlayerConfig buildConfig(ParticipantType type, Spinner<Integer> depth, Spinner<Integer> sims) {
         if (type == ParticipantType.EXPECTIMINIMAX_BOT) {
             return PlayerConfig.bot(new ExpectiminimaxBot(depth.getValue()));
+        }
+        if (type == ParticipantType.MONTE_CARLO_BOT) {
+            return PlayerConfig.bot(new MonteCarloBot(sims.getValue()));
         }
         return type.createConfig();
     }

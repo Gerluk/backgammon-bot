@@ -1,4 +1,4 @@
-package org.example.bots;
+package org.example.bots.strategy;
 
 import org.example.model.Board;
 import org.example.model.Player;

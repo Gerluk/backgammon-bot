@@ -1,5 +1,6 @@
-package org.example.bots;
+package org.example.bots.strategy;
 
+import org.example.bots.Bot;
 import org.example.model.GameState;
 import org.example.model.Move;
 

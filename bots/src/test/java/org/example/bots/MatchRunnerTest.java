@@ -1,5 +1,6 @@
 package org.example.bots;
 
+import org.example.bots.strategy.RandomBot;
 import org.example.model.*;
 import org.example.rules.GameEngine;
 import org.junit.jupiter.api.Test;
