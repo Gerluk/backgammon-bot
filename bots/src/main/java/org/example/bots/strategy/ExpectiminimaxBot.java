@@ -19,7 +19,7 @@ public class ExpectiminimaxBot implements Bot {
     private static List<DiceOutcome> buildDiceOutcomes() {
         List<DiceOutcome> outcomes = new ArrayList<>();
         for (int d1 = 1; d1 <= 6; d1++) {
-            for (int d2 = 1; d2 <= 6; d2++) {
+            for (int d2 = 1; d2 <= d1; d2++) {
                 double probability = (d1 == d2) ? (1.0 / 36.0) : (2.0 / 36.0);
                 outcomes.add(new DiceOutcome(d1, d2, probability));
             }
@@ -121,7 +121,7 @@ public class ExpectiminimaxBot implements Bot {
             remainingProbability -= outcome.probability();
 
             double optimisticBound = expectedValue + remainingProbability * BoardEvaluator.MAX_VALUE;
-            double pessimisticBound = expectedValue + remainingProbability * BoardEvaluator.MAX_VALUE;
+            double pessimisticBound = expectedValue + remainingProbability * BoardEvaluator.MIN_VALUE;
 
             if (pessimisticBound >= beta) {
                 return pessimisticBound;

@@ -35,6 +35,15 @@ public class BenchmarkMain {
                             "Random", RandomBot::new));
         }
 
+        for (int depth : EXPECTIMINIMAX_DEPTHS) {
+            for (int sims : MONTE_CARLO_SIMULATIONS) {
+                String matchupId = "Expectiminimax(depth=" + depth + ") vs MonteCarlo(sims=" + sims + ")";
+                allRecords.addAll(runTimedSeries(runner, matchupId,
+                        "Expectiminimax(depth=" + depth + ")", () -> new ExpectiminimaxBot(depth),
+                        "MonteCarlo(sims=" + sims + ")", () -> new MonteCarloBot(sims)));
+            }
+        }
+
         Path outputFile = Path.of("benchmark-results.csv");
         CsvExporter.export(allRecords, outputFile);
         System.out.println("Zapisano " + allRecords.size() + " gier do " + outputFile.toAbsolutePath());
