@@ -14,8 +14,9 @@ import java.util.function.Supplier;
 public class BenchmarkMain {
 
     private static final int NUM_GAMES = 100;
-    private static final int[] EXPECTIMINIMAX_DEPTHS = {0, 1, 2, 3};
-    private static final int[] MONTE_CARLO_SIMULATIONS = {25, 50, 75, 100};
+    private static final int THREADS = Runtime.getRuntime().availableProcessors();
+    private static final int[] EXPECTIMINIMAX_DEPTHS = {0, 1, 2};
+    private static final int[] MONTE_CARLO_SIMULATIONS = {25, 50, 75};
 
     public static void main(String[] args) throws IOException {
         SeriesRunner runner = new SeriesRunner();
@@ -31,7 +32,7 @@ public class BenchmarkMain {
         for (int sims : MONTE_CARLO_SIMULATIONS) {
             String matchupId = "MonteCarlo(sims=" + sims + ") vs Random";
             allRecords.addAll(runTimedSeries(runner, matchupId,
-                    "MonteCarlo(sims=" + sims + ")", () -> new MonteCarloBot(sims),
+                    "MonteCarlo(sims=" + sims + ")", () -> new MonteCarloBot(sims, THREADS),
                             "Random", RandomBot::new));
         }
 
@@ -40,7 +41,7 @@ public class BenchmarkMain {
                 String matchupId = "Expectiminimax(depth=" + depth + ") vs MonteCarlo(sims=" + sims + ")";
                 allRecords.addAll(runTimedSeries(runner, matchupId,
                         "Expectiminimax(depth=" + depth + ")", () -> new ExpectiminimaxBot(depth),
-                        "MonteCarlo(sims=" + sims + ")", () -> new MonteCarloBot(sims)));
+                        "MonteCarlo(sims=" + sims + ")", () -> new MonteCarloBot(sims, THREADS)));
             }
         }
 

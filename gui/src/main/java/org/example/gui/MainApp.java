@@ -175,7 +175,7 @@ public class MainApp extends Application {
             return PlayerConfig.bot(new ExpectiminimaxBot(depth.getValue()));
         }
         if (type == ParticipantType.MONTE_CARLO_BOT) {
-            return PlayerConfig.bot(new MonteCarloBot(sims.getValue()));
+            return PlayerConfig.bot(new MonteCarloBot(sims.getValue(), Runtime.getRuntime().availableProcessors()));
         }
         return type.createConfig();
     }

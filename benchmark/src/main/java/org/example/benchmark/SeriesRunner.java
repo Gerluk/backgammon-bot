@@ -16,8 +16,8 @@ public class SeriesRunner {
                                       String sideALabel, Supplier<Bot> sideASupplier,
                                       String sideBLabel, Supplier<Bot> sideBSupplier,
                                       int numGames) {
-        return IntStream.range(0, numGames)
-                .parallel()
+        IntStream gameIndices = IntStream.range(0, numGames);
+        return gameIndices
                 .mapToObj(gameIndex -> playOneGame(
                         matchupId, gameIndex, sideALabel, sideASupplier, sideBLabel, sideBSupplier))
                 .toList();

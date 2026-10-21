@@ -35,7 +35,8 @@ public enum ParticipantType {
             case HUMAN -> PlayerConfig.human();
             case RANDOM_BOT -> PlayerConfig.bot(new RandomBot());
             case EXPECTIMINIMAX_BOT -> PlayerConfig.bot(new ExpectiminimaxBot(1));
-            case MONTE_CARLO_BOT -> PlayerConfig.bot(new MonteCarloBot(50));
+            case MONTE_CARLO_BOT -> PlayerConfig.bot(
+                    new MonteCarloBot(50, Runtime.getRuntime().availableProcessors()));
         };
     }
 
