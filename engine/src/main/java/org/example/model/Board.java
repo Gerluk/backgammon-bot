@@ -184,6 +184,9 @@ public final class Board {
 
     public boolean isBackgammon(Player winner) {
         Player loser = winner.opponent();
+        if (borneOffCount(loser) > 0) {
+            return false;
+        }
         if (barCount(loser) > 0) {
             return true;
         }
