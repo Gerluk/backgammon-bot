@@ -13,10 +13,10 @@ import java.util.function.Supplier;
 
 public class BenchmarkMain {
 
-    private static final int NUM_GAMES = 100;
+    private static final int NUM_GAMES = 500;
     private static final int THREADS = Runtime.getRuntime().availableProcessors();
     private static final int[] EXPECTIMINIMAX_DEPTHS = {0, 1, 2};
-    private static final int[] MONTE_CARLO_SIMULATIONS = {25, 50, 75};
+    private static final int[] MONTE_CARLO_SIMULATIONS = {33, 67, 100};
 
     public static void main(String[] args) throws IOException {
         SeriesRunner runner = new SeriesRunner();

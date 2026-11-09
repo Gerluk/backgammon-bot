@@ -115,10 +115,18 @@ public class ExpectiminimaxBot implements Bot {
 
         for (DiceOutcome outcome : DICE_OUTCOMES) {
             GameState nextState = resultState.withNextTurn(new Dice(outcome.die1(), outcome.die2()));
-            double value = decisionValue(nextState, depthRemaining - 1, alpha, beta);
 
-            expectedValue += outcome.probability() * value;
-            remainingProbability -= outcome.probability();
+            double p = outcome.probability();
+            remainingProbability -= p;
+
+            double childAlpha = (alpha - expectedValue - remainingProbability * BoardEvaluator.MAX_VALUE) / p;
+            double childBeta  = (beta  - expectedValue - remainingProbability * BoardEvaluator.MIN_VALUE) / p;
+
+            double value = decisionValue(nextState, depthRemaining - 1,
+                    Math.max(childAlpha, BoardEvaluator.MIN_VALUE),
+                    Math.min(childBeta,  BoardEvaluator.MAX_VALUE));
+
+            expectedValue += p * value;
 
             double optimisticBound = expectedValue + remainingProbability * BoardEvaluator.MAX_VALUE;
             double pessimisticBound = expectedValue + remainingProbability * BoardEvaluator.MIN_VALUE;
