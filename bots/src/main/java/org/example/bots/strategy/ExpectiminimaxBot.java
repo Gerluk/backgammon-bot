@@ -8,7 +8,9 @@ import org.example.model.Player;
 import org.example.rules.GameEngine;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ExpectiminimaxBot implements Bot {
 
@@ -56,8 +58,13 @@ public class ExpectiminimaxBot implements Bot {
         double alpha = Double.NEGATIVE_INFINITY;
         double beta = Double.POSITIVE_INFINITY;
 
+        Set<String> seen = new HashSet<>();
+
         for (List<Move> turn : availableTurns) {
             GameState resultState = applyAll(state, turn);
+            if (!seen.add(PositionKey.of(resultState.board()))) {
+                continue;
+            }
             double value = chanceValue(resultState, depth, alpha, beta);
 
             if (maximizing ? value > bestValue : value < bestValue) {
@@ -84,8 +91,13 @@ public class ExpectiminimaxBot implements Bot {
         List<List<Move>> turns = engine.legalFullTurns(state);
 
         double value = maximizing ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+        Set<String> seen = new HashSet<>();
+
         for (List<Move> turn : turns) {
             GameState resultState = applyAll(state, turn);
+            if (!seen.add(PositionKey.of(resultState.board()))) {
+                continue;
+            }
             double childValue = chanceValue(resultState, depthRemaining, alpha, beta);
 
             if (maximizing) {

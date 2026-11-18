@@ -4,10 +4,7 @@ import org.example.bots.Bot;
 import org.example.model.*;
 import org.example.rules.GameEngine;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.SplittableRandom;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -55,12 +52,20 @@ public class MonteCarloBot implements Bot {
         }
 
         Player mover = state.currentPlayer();
-        int candidates = availableTurns.size();
 
-        GameState[] resultStates = new GameState[candidates];
-        for (int i = 0; i < candidates; i++) {
-            resultStates[i] = applyAll(state, availableTurns.get(i));
+        List<Integer> keptIndices = new ArrayList<>();
+        List<GameState> keptStates = new ArrayList<>();
+        Set<String> seen = new HashSet<>();
+        for (int i = 0; i < availableTurns.size(); i++) {
+            GameState result = applyAll(state, availableTurns.get(i));
+            if (seen.add(PositionKey.of(result.board()))) {
+                keptIndices.add(i);
+                keptStates.add(result);
+            }
         }
+
+        int candidates = keptStates.size();
+        GameState[] resultStates = keptStates.toArray(new GameState[0]);
 
         int total = candidates * simulationsPerCandidate;
         long[] seeds = new long[total];
