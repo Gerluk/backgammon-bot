@@ -89,7 +89,7 @@ public class MonteCarloBot implements Bot {
                 bestIndex = c;
             }
         }
-        return availableTurns.get(bestIndex);
+        return availableTurns.get(keptIndices.get(bestIndex));
     }
 
     private double[] runSimulation(GameState[] resultStates, Player mover, long[] seeds) {
