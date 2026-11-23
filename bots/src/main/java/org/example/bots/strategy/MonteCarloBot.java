@@ -130,6 +130,11 @@ public class MonteCarloBot implements Bot {
     }
 
     private double rollout(GameState state, Player mover, Random rng, Bot basePolicy) {
+        Player immediateWinner = engine.winnerOrNull(state.board());
+        if (immediateWinner != null) {
+            return score(state.board(), immediateWinner, mover);
+        }
+
         GameState current = state.withNextTurn(Dice.roll(rng));
 
         for (int turnsPlayed = 0; turnsPlayed < MAX_ROLLOUT_TURNS; turnsPlayed++) {
