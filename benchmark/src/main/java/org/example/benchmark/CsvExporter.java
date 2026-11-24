@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 public class CsvExporter {
@@ -19,6 +20,25 @@ public class CsvExporter {
         try (BufferedWriter writer = Files.newBufferedWriter(outputFile)) {
             writer.write(HEADER);
             writer.newLine();
+            for (GameRecord record : records) {
+                writer.write(toCsvRow(record));
+                writer.newLine();
+            }
+        }
+    }
+
+    public static void append(List<GameRecord> records, Path outputFile) throws IOException {
+        Path parent = outputFile.toAbsolutePath().getParent();
+        if (parent != null) {
+            Files.createDirectories(parent);
+        }
+        boolean writeHeader = !Files.exists(outputFile) || Files.size(outputFile) == 0;
+        try (BufferedWriter writer = Files.newBufferedWriter(
+                outputFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+            if (writeHeader) {
+                writer.write(HEADER);
+                writer.newLine();
+            }
             for (GameRecord record : records) {
                 writer.write(toCsvRow(record));
                 writer.newLine();

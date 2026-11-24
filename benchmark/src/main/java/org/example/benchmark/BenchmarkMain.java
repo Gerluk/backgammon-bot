@@ -13,50 +13,55 @@ import java.util.function.Supplier;
 
 public class BenchmarkMain {
 
-    private static final int NUM_GAMES = 500;
+    private static final int CHUNK_GAMES = 50;
+    private static final int VS_RANDOM_GAMES = 200;
+    private static final int DUEL_GAMES = 500;
     private static final int THREADS = Runtime.getRuntime().availableProcessors();
-    private static final int[] EXPECTIMINIMAX_DEPTHS = {0, 1, 2};
-    private static final int[] MONTE_CARLO_SIMULATIONS = {33, 67, 100};
+    private static final Path OUTPUT = Path.of("results", "benchmark-results.csv");
+
+    private record Contestant(String label, Supplier<Bot> factory) {}
+
+    private static Contestant expectiminimax(int depth) {
+        return new Contestant("Expectiminimax(depth=" + depth + ")", () -> new ExpectiminimaxBot(depth));
+    }
+
+    private static Contestant monteCarlo(int sims) {
+        return new Contestant("MonteCarlo(sims=" + sims + ")", () -> new MonteCarloBot(sims, THREADS));
+    }
 
     public static void main(String[] args) throws IOException {
         SeriesRunner runner = new SeriesRunner();
-        List<GameRecord> allRecords = new ArrayList<>();
+        Contestant random = new Contestant("Random", RandomBot::new);
 
-        for (int depth : EXPECTIMINIMAX_DEPTHS) {
-            String matchupId = "Expectiminimax(depth=" + depth + ") vs Random";
-            allRecords.addAll(runTimedSeries(runner, matchupId,
-                    "Expectiminimax(depth=" + depth + ")", () -> new ExpectiminimaxBot(depth),
-                    "Random", RandomBot::new));
+        List<Contestant> monteCarlos = List.of(
+                monteCarlo(25), monteCarlo(50), monteCarlo(75), monteCarlo(100));
+
+        for (Contestant bot : List.of(
+                expectiminimax(1), expectiminimax(2), monteCarlos.getFirst(), monteCarlos.getLast())) {
+            runMatchup(runner, bot, random, VS_RANDOM_GAMES);
         }
 
-        for (int sims : MONTE_CARLO_SIMULATIONS) {
-            String matchupId = "MonteCarlo(sims=" + sims + ") vs Random";
-            allRecords.addAll(runTimedSeries(runner, matchupId,
-                    "MonteCarlo(sims=" + sims + ")", () -> new MonteCarloBot(sims, THREADS),
-                            "Random", RandomBot::new));
-        }
-
-        for (int depth : EXPECTIMINIMAX_DEPTHS) {
-            for (int sims : MONTE_CARLO_SIMULATIONS) {
-                String matchupId = "Expectiminimax(depth=" + depth + ") vs MonteCarlo(sims=" + sims + ")";
-                allRecords.addAll(runTimedSeries(runner, matchupId,
-                        "Expectiminimax(depth=" + depth + ")", () -> new ExpectiminimaxBot(depth),
-                        "MonteCarlo(sims=" + sims + ")", () -> new MonteCarloBot(sims, THREADS)));
+        for (int depth = 0; depth <= 3; depth++) {
+            Contestant em = expectiminimax(depth);
+            for (Contestant mc : monteCarlos) {
+                runMatchup(runner, em, mc, DUEL_GAMES);
             }
         }
 
-        Path outputFile = Path.of("benchmark-results.csv");
-        CsvExporter.export(allRecords, outputFile);
-        System.out.println("Zapisano " + allRecords.size() + " gier do " + outputFile.toAbsolutePath());
+        System.out.println("Zakończono. Wyniki: " + OUTPUT.toAbsolutePath());
     }
 
-    private static List<GameRecord> runTimedSeries(SeriesRunner runner, String matchupId, String sideALabel,
-                                                   Supplier<Bot> sideA, String sideBLabel, Supplier<Bot> sideB) {
-        System.out.println("Uruchamiam: " + matchupId + " (" + NUM_GAMES + " gier)");
+    private static void runMatchup(SeriesRunner runner, Contestant a, Contestant b, int games) throws IOException {
+        String matchupId = a.label() + " vs " + b.label();
+        System.out.println("Uruchamiam: " + matchupId + " (" + games + " gier)");
         long start = System.nanoTime();
-        List<GameRecord> records = runner.runSeries(matchupId, sideALabel, sideA, sideBLabel, sideB, NUM_GAMES);
-        double seconds = (System.nanoTime() - start) / 1_000_000_000.0;
-        System.out.printf("   zakończono w %.1fs (%.2fs/grę)%n", seconds, seconds / NUM_GAMES);
-        return records;
+
+        for (int done = 0; done < games; done += CHUNK_GAMES) {
+            int n = Math.min(CHUNK_GAMES, games - done);
+            List<GameRecord> records = runner.runSeries(matchupId, a.label(), a.factory(), b.label(), b.factory(), n);
+            CsvExporter.append(records, OUTPUT);
+            double seconds = (System.nanoTime() - start) / 1_000_000_000.0;
+            System.out.printf(" %d/%d gier, %.1f s od początku pojedynku%n", done + n, games, seconds);
+        }
     }
 }
